@@ -1,0 +1,6 @@
+vendor/
+labs/
+*.log
+patch_*.py
+index_v1_backup.html
+CLAUDE.md

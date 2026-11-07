@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sid.ascii</title>
+<meta name="description" content="Sid's projects, drawn in ASCII.">
+<style>
+  :root { --bg:#0b0d0c; --fg:#7dffb2; --dim:#2f6b4a; --hi:#eafff2; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; height:100%; background:var(--bg); color:var(--fg);
+    font-family: ui-monospace, "Cascadia Mono", Consolas, Menlo, monospace; }
+  canvas#bg { position:fixed; inset:0; width:100%; height:100%; display:block; }
+  main { position:relative; z-index:1; max-width:760px; margin:0 auto; padding:8vh 16px 10vh; }
+  pre.logo { margin:0 0 1rem; font-size:clamp(7px,2.1vw,15px); line-height:1.05; color:var(--hi);
+    text-shadow:0 0 8px var(--fg); }
+  .panel { background:rgba(11,13,12,.82); border:1px solid var(--dim); padding:14px 16px; margin:0 0 18px;
+    backdrop-filter: blur(2px); }
+  h2 { margin:0 0 8px; font-size:1rem; color:var(--hi); font-weight:normal; }
+  h2::before { content:"> "; color:var(--dim); }
+  p { margin:0 0 8px; line-height:1.5; }
+  ul { list-style:none; margin:0; padding:0; }
+  li a { display:block; padding:6px 8px; margin:2px 0; color:var(--fg); text-decoration:none; border:1px solid transparent; }
+  li a:hover, li a:focus-visible { border-color:var(--fg); background:rgba(125,255,178,.08); color:var(--hi); outline:none; }
+  li a span { color:var(--dim); }
+  li a:hover span, li a:focus-visible span { color:var(--fg); }
+  .hint { color:var(--dim); font-size:.85rem; }
+  .cursor::after { content:"_"; animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity:0; } }
+  @media (prefers-reduced-motion: reduce) { .cursor::after { animation:none; } }
+  #fx { display:flex; flex-wrap:wrap; gap:6px; }
+  #fx button, #fx label { font:inherit; color:var(--fg); background:transparent; border:1px solid var(--dim); padding:5px 10px; cursor:pointer; }
+  #fx button:hover, #fx button:focus-visible, #fx label:hover { border-color:var(--fg); color:var(--hi); outline:none; }
+  #fx button[aria-pressed="true"] { background:rgba(125,255,178,.14); border-color:var(--fg); color:var(--hi); }
+  #fx input { display:none; }
+</style>
+<link rel="stylesheet" href="lib/glass.css">
+</head>
+<body>
+<canvas id="bg" aria-hidden="true"></canvas>
+<main>
+<pre class="logo" aria-label="SID">
+ ___ ___ ___
+/ __|_ _|   \
+\__ \| || |) |
+|___/___|___/   .ascii
+</pre>
+<section class="panel">
+  <h2>hello</h2>
+  <p>I build small tools, games and video experiments. <span class="cursor">Move the mouse. Click the background.</span></p>
+  <p class="hint">hover a project to change the world behind it.</p>
+</section>
+<section class="panel">
+  <h2>effects</h2>
+  <div id="fx">
+    <button data-mode="waves" aria-pressed="true">waves</button>
+    <button data-mode="pixels" aria-pressed="false">ascii pixels</button>
+    <button data-mode="water" aria-pressed="false">hover water</button>
+    <button data-mode="trail" aria-pressed="false">image trail</button>
+    <button data-mode="grid" aria-pressed="false">box grid</button>
+    <label>use my image<input id="pic" type="file" accept="image/*"></label>
+  </div>
+  <p class="hint" style="margin-top:8px">ascii pixels: move the mouse to push the light. Upload an image to see it as ASCII (stays in your browser).</p>
+</section>
+<section class="panel">
+  <h2>projects</h2>
+  <ul id="projects">
+    <li><a href="#" data-mode="waves">Marble Races <span>// live race server + viewer</span></a></li>
+    <li><a href="#" data-mode="rain">VFX Pipeline <span>// tracked-marker effects on phone clips</span></a></li>
+    <li><a href="#" data-mode="stars">Sound of Sorting <span>// sorting algorithms you can hear</span></a></li>
+    <li><a href="#" data-mode="fire">Life Map <span>// a map of a life</span></a></li>
+  </ul>
+</section>
+<section class="panel">
+  <h2>contact</h2>
+  <p><a href="#" style="color:var(--fg)">add your link here</a></p>
+</section>
+</main>
+<script>
+(() => {
+  const cv = document.getElementById('bg'), ctx = cv.getContext('2d');
+  const RAMP = ' .\'`^",:;Il!i~+_-?][}{1)(|/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$';
+  const CELL_W = 9, CELL_H = 16;
+  let cols, rows, dpr, mode = 'waves', mx = -1, my = -1, ripples = [], t0 = performance.now();
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const drops = [];
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width = innerWidth * dpr; cv.height = innerHeight * dpr;
+    cols = Math.ceil(innerWidth / CELL_W); rows = Math.ceil(innerHeight / CELL_H);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.font = '14px ui-monospace, Consolas, Menlo, monospace'; ctx.textBaseline = 'top';
+    drops.length = 0; for (let i = 0; i < cols; i++) drops.push(Math.random() * rows);
+  }
+  addEventListener('resize', resize); resize();
+  addEventListener('pointermove', e => { mx = e.clientX / CELL_W; my = e.clientY / CELL_H; });
+  addEventListener('pointerdown', e => {
+    if (e.target.closest('main')) return;
+    ripples.push({ x: e.clientX / CELL_W, y: e.clientY / CELL_H, t: performance.now() });
+  });
+  document.querySelectorAll('#projects a').forEach(a => {
+    const set = () => { setMode(a.dataset.mode); };
+    a.addEventListener('mouseenter', set); a.addEventListener('focus', set);
+    a.addEventListener('click', e => e.preventDefault());
+  });
+
+  function field(x, y, t) {
+    let v;
+    if (mode === 'waves') {
+      v = Math.sin(x * .09 + t * .9) + Math.sin(y * .15 - t * .7) + Math.sin((x + y) * .06 + t * .5);
+      v = (v + 3) / 6;
+    } else if (mode === 'stars') {
+      const h = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453; v = h - Math.floor(h);
+      v = v > .985 ? .5 + .5 * Math.sin(t * 3 + x + y) : 0;
+    } else if (mode === 'fire') {
+      const base = (rows - y) / rows;
+      v = base * (.6 + .4 * Math.sin(x * .3 + t * 4 + Math.sin(y * .4 - t * 3) * 2)) - .2;
+    } else { v = 0; }
+    // mouse glow
+    if (mx >= 0) { const d = Math.hypot((x - mx) * .55, y - my); v += Math.max(0, 1 - d / 9) * .9; }
+    // click ripples
+    const now = performance.now();
+    for (const r of ripples) {
+      const age = (now - r.t) / 1000, d = Math.hypot((x - r.x) * .55, y - r.y);
+      v += Math.max(0, 1 - Math.abs(d - age * 14) / 2.2) * Math.max(0, 1 - age / 2.5);
+    }
+    return Math.max(0, Math.min(1, v));
+  }
+
+
+  // ---------- extra effects ----------
+  const R = {};
+  const off = document.createElement('canvas'), octx = off.getContext('2d', { willReadFrequently: true });
+  let userImg = null;
+  const RAMP2 = ' .:-=+*#%@';
+  document.getElementById('pic').addEventListener('change', e => {
+    const f = e.target.files[0]; if (!f) return;
+    const img = new Image(); img.onload = () => { userImg = img; setMode('pixels'); }; img.src = URL.createObjectURL(f);
+  });
+  function setMode(m) {
+    mode = m;
+    document.querySelectorAll('#fx button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === m)));
+  }
+  document.querySelectorAll('#fx button').forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
+
+  // ascii pixels: draw a source at 1 px per cell, map brightness to characters
+  R.pixels = (t) => {
+    if (off.width !== cols || off.height !== rows) { off.width = cols; off.height = rows; }
+    octx.fillStyle = '#000'; octx.fillRect(0, 0, cols, rows);
+    if (userImg) {
+      const k = Math.max(cols / userImg.width, rows / (userImg.height * (CELL_W / CELL_H)));
+      const w = userImg.width * k, h = userImg.height * k * (CELL_W / CELL_H);
+      octx.drawImage(userImg, (cols - w) / 2, (rows - h) / 2, w, h);
+    } else {
+      const g = (x, y, r, a) => { const gr = octx.createRadialGradient(x, y, 0, x, y, r);
+        gr.addColorStop(0, `rgba(255,255,255,${a})`); gr.addColorStop(1, 'rgba(255,255,255,0)');
+        octx.fillStyle = gr; octx.fillRect(0, 0, cols, rows); };
+      for (let i = 0; i < 5; i++) g(cols * (.5 + .35 * Math.sin(t * .4 + i * 1.7)), rows * (.5 + .35 * Math.cos(t * .5 + i * 2.3)), rows * .5, .9);
+    }
+    if (mx >= 0) { const gr = octx.createRadialGradient(mx, my, 0, mx, my, 10);
+      gr.addColorStop(0, 'rgba(255,255,255,.9)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+      octx.fillStyle = gr; octx.fillRect(0, 0, cols, rows); }
+    const d = octx.getImageData(0, 0, cols, rows).data;
+    for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) {
+      const i = (y * cols + x) * 4, v = (d[i] * .3 + d[i + 1] * .59 + d[i + 2] * .11) / 255;
+      if (v < .06) continue;
+      ctx.fillStyle = `rgba(125,255,178,${.25 + v * .75})`;
+      ctx.fillText(RAMP2[Math.min(RAMP2.length - 1, Math.floor(v * RAMP2.length))], x * CELL_W, y * CELL_H);
+    }
+  };
+
+  // hover water: 2D ripple height field disturbed by the cursor
+  let hA = null, hB = null;
+  addEventListener('pointermove', () => { if (mode === 'water' && hA && mx >= 0) {
+    const x = Math.floor(mx), y = Math.floor(my); if (x > 1 && y > 1 && x < cols - 2 && y < rows - 2) hA[y * cols + x] = 6; } });
+  addEventListener('pointerdown', e => { if (mode === 'water' && hA && !e.target.closest('main')) {
+    const x = Math.floor(e.clientX / CELL_W), y = Math.floor(e.clientY / CELL_H);
+    for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) { const xx = x + dx, yy = y + dy;
+      if (xx > 0 && yy > 0 && xx < cols - 1 && yy < rows - 1) hA[yy * cols + xx] = 14; } } });
+  R.water = () => {
+    if (!hA || hA.length !== cols * rows) { hA = new Float32Array(cols * rows); hB = new Float32Array(cols * rows); }
+    for (let y = 1; y < rows - 1; y++) for (let x = 1; x < cols - 1; x++) {
+      const i = y * cols + x;
+      hB[i] = ((hA[i - 1] + hA[i + 1] + hA[i - cols] + hA[i + cols]) / 2 - hB[i]) * .965;
+    }
+    [hA, hB] = [hB, hA];
+    for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) {
+      const h = hA[y * cols + x], v = Math.min(1, Math.abs(h) / 4); if (v < .05) continue;
+      ctx.fillStyle = h > 0 ? `rgba(234,255,242,${.2 + v * .8})` : `rgba(125,255,178,${.15 + v * .6})`;
+      ctx.fillText(h > 0 ? '~' : (v > .5 ? 'o' : '.'), x * CELL_W, y * CELL_H);
+    }
+  };
+
+  // image trail: fading ascii stamps following the cursor
+  const STAMPS = [[' /\\_/\\ ', '( o.o )', ' > ^ < '], ['  .-.  ', ' (o o) ', '  |=|  '], [' _____ ', '|     |', '|_____|'], ['  /|\\  ', ' / | \\ ', '  \\|/  ']];
+  const trail = []; let lastTx = -1, lastTy = -1;
+  addEventListener('pointermove', e => {
+    if (mode !== 'trail') return;
+    const x = e.clientX / CELL_W, y = e.clientY / CELL_H;
+    if (Math.hypot(x - lastTx, y - lastTy) < 3) return;
+    lastTx = x; lastTy = y; trail.push({ x, y, t: performance.now(), s: Math.floor(Math.random() * STAMPS.length) });
+    if (trail.length > 40) trail.shift();
+  });
+  R.trail = (t, now) => {
+    for (const p of trail) {
+      const age = (now - p.t) / 1400; if (age >= 1) continue;
+      const st = STAMPS[p.s], a = (1 - age) * .9, rise = age * 4;
+      ctx.fillStyle = `rgba(125,255,178,${a})`;
+      st.forEach((line, i) => ctx.fillText(line, (p.x - 3.5) * CELL_W, (p.y - 1.5 + i - rise) * CELL_H));
+    }
+    while (trail.length && now - trail[0].t > 1400) trail.shift();
+  };
+
+  // interactive box grid: cells glow and flip characters near the cursor
+  const GW = 6, GH = 3; let energy = null;
+  R.grid = () => {
+    const gc = Math.ceil(cols / GW), gr = Math.ceil(rows / GH);
+    if (!energy || energy.length !== gc * gr) energy = new Float32Array(gc * gr);
+    for (let j = 0; j < gr; j++) for (let i = 0; i < gc; i++) {
+      const k = j * gc + i, cx = i * GW + GW / 2, cy = j * GH + GH / 2;
+      if (mx >= 0) energy[k] = Math.max(energy[k], Math.max(0, 1 - Math.hypot((cx - mx) * .55, cy - my) / 8));
+      energy[k] *= .93;
+      const e = energy[k];
+      ctx.fillStyle = `rgba(125,255,178,${.15 + e * .85})`;
+      const x0 = i * GW * CELL_W, y0 = j * GH * CELL_H;
+      ctx.fillText('+' + (e > .35 ? '=====' : '-----'), x0, y0);
+      ctx.fillText(e > .2 ? '|' + RAMP2[Math.min(9, Math.floor(e * 10))].repeat(4) + ' ' : '|    ', x0, y0 + CELL_H);
+      ctx.fillText(e > .6 ? '|@#@# ' : '|    ', x0, y0 + 2 * CELL_H);
+    }
+  };
+
+  function frame(now) {
+    const t = reduce ? 0 : (now - t0) / 1000;
+    ripples = ripples.filter(r => now - r.t < 2500);
+    ctx.fillStyle = '#0b0d0c'; ctx.fillRect(0, 0, innerWidth, innerHeight);
+    if (mode === 'rain') {
+      for (let i = 0; i < cols; i++) {
+        drops[i] += .35 + (i % 5) * .07; if (drops[i] > rows + 12) drops[i] = -Math.random() * 20;
+        for (let k = 0; k < 12; k++) {
+          const y = Math.floor(drops[i]) - k; if (y < 0 || y >= rows) continue;
+          ctx.fillStyle = k === 0 ? '#eafff2' : `rgba(125,255,178,${.7 - k * .055})`;
+          ctx.fillText(String.fromCharCode(0x30A0 + ((i * 7 + y * 3 + Math.floor(t * 8)) % 90)), i * CELL_W, y * CELL_H);
+        }
+      }
+    }
+    const lo = mode === 'rain' ? 1 : 0;
+    if (R[mode]) R[mode](t, now);
+    else if (!lo) {
+      for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) {
+        const v = field(x, y, t); if (v < .04) continue;
+        ctx.fillStyle = `rgba(125,255,178,${.12 + v * .75})`;
+        ctx.fillText(RAMP[Math.floor(v * (RAMP.length - 1))], x * CELL_W, y * CELL_H);
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="lib/container.js"></script>
+<script src="lib/button.js"></script>
+<script>
+  // Liquid Glass JS (MIT, dashersw): a glass button floating over the ASCII canvas; click to cycle effects.
+  addEventListener('load', () => {
+    try {
+      const order = ['waves', 'pixels', 'water', 'trail', 'grid'];
+      const btn = new Button({ text: 'next effect', size: 22, type: 'pill', tintOpacity: 0.15, onClick: () => {
+        const cur = document.querySelector('#fx button[aria-pressed="true"]');
+        const i = cur ? order.indexOf(cur.dataset.mode) : -1;
+        document.querySelector('#fx button[data-mode="' + order[(i + 1) % order.length] + '"]').click();
+      } });
+      btn.element.style.cssText += ';position:fixed;right:24px;bottom:24px;z-index:5';
+      document.body.appendChild(btn.element);
+    } catch (e) { console.warn('glass button unavailable', e); }
+  });
+</script>
+</body>
+</html>
