@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>sid.ascii</title>
-<meta name="description" content="Sid's projects, drawn in ASCII.">
+<title>Sid's walking gallery</title>
+<meta name="description" content="A walking gallery of Sid's work this semester: gallery, photovoice, mind-map and Media Arts artefact.">
 <style>
   :root { --bg:#0b0d0c; --fg:#7dffb2; --dim:#2f6b4a; --hi:#eafff2; }
   * { box-sizing: border-box; }
@@ -28,54 +28,414 @@
   .cursor::after { content:"_"; animation: blink 1s steps(1) infinite; }
   @keyframes blink { 50% { opacity:0; } }
   @media (prefers-reduced-motion: reduce) { .cursor::after { animation:none; } }
-  #fx { display:flex; flex-wrap:wrap; gap:6px; }
-  #fx button, #fx label { font:inherit; color:var(--fg); background:transparent; border:1px solid var(--dim); padding:5px 10px; cursor:pointer; }
-  #fx button:hover, #fx button:focus-visible, #fx label:hover { border-color:var(--fg); color:var(--hi); outline:none; }
-  #fx button[aria-pressed="true"] { background:rgba(125,255,178,.14); border-color:var(--fg); color:var(--hi); }
-  #fx input { display:none; }
+
+  main { max-width:860px; }
+  [hidden] { display:none !important; }
+  #walk { background:rgba(11,13,12,.82); border:1px solid var(--dim); padding:12px 16px; margin:0 0 18px; position:sticky; top:8px; z-index:3; }
+  #walk .stops { display:flex; flex-wrap:wrap; gap:4px 18px; justify-content:space-between; }
+  #walk .stops a { color:var(--fg); text-decoration:none; padding:3px 6px; border:1px solid transparent; }
+  #walk .stops a:hover, #walk .stops a:focus-visible { border-color:var(--fg); outline:none; }
+  #walk .stops a[aria-current="page"] { color:var(--hi); border-color:var(--fg); background:rgba(125,255,178,.12); }
+  #walk .track { position:relative; height:1.4em; margin:8px 1.5em 2px; border-bottom:1px dashed var(--dim); }
+  .walker { position:absolute; bottom:0; left:0; transform:translateX(-50%); color:var(--hi); text-shadow:0 0 8px var(--fg); transition:left .7s ease-in-out; white-space:pre; }
+  .walker.step { animation:walk .7s steps(2) 1; }
+  @keyframes walk { 50% { margin-bottom:3px; } }
+  #walk p { margin:6px 0 0; }
+  .room { background:rgba(11,13,12,.84); border:1px solid var(--dim); padding:16px 18px 10px; margin:0 0 18px; }
+  .room h2 { font-size:1.15rem; }
+  .room h3 { margin:18px 0 8px; font-size:.95rem; font-weight:normal; color:var(--fg); }
+  .intro { color:var(--hi); }
+  figure.work { margin:0 0 20px; display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); gap:14px; align-items:start; }
+  figure.work.big { grid-template-columns:1fr; }
+  .frame { position:relative; border:1px solid var(--fg); padding:6px; box-shadow:0 0 0 3px var(--bg), 0 0 0 4px var(--dim); background:rgba(0,0,0,.35); min-height:120px; }
+  .frame img { display:block; width:100%; height:auto; }
+  .frame.empty { aspect-ratio:4/3; display:grid; place-items:center; }
+  .frame.empty.wide { aspect-ratio:16/9; }
+  .frame.empty img { display:none; }
+  .frame .ph { display:none; color:var(--dim); font-size:.8rem; text-align:center; padding:8px; }
+  .frame.empty .ph { display:block; }
+  figcaption b { color:var(--hi); font-weight:normal; }
+  .theory { color:var(--dim); font-size:.9rem; }
+  .quote { font-size:1.15rem; color:var(--hi); text-align:center; margin:6px 0; }
+  ul.plain li { padding:4px 0; line-height:1.5; }
+  details.panel summary { cursor:pointer; color:var(--dim); }
+  details.panel[open] summary { margin-bottom:10px; }
+  @media (max-width:640px) { figure.work { grid-template-columns:1fr; } #walk .stops { font-size:.85rem; } }
+  .frame.multi { display:grid; gap:8px; }
+  .frame video { display:block; width:100%; height:auto; background:#000; }
+  figure.work { grid-template-columns:minmax(0,1.3fr) minmax(0,1fr); }
+  .topic { color:var(--dim); border:1px solid var(--dim); padding:0 6px; margin-left:6px; font-size:.8rem; white-space:nowrap; }
+  #photovoice .frame img { max-height:75vh; width:auto; max-width:100%; margin:0 auto; }
+
+  .mm-detail { border:1px solid var(--c, var(--dim)); border-left-width:6px; padding:10px 14px; background:rgba(0,0,0,.35); min-height:7em; }
+  .mm-detail h4 { margin:0 0 6px; color:var(--hi); font-weight:normal; }
+  figure.art { margin:0 0 20px; max-width:680px; }
+  .hs-wrap { position:relative; }
+  .hs { position:absolute; transform:translate(-50%,-50%); font:inherit; font-size:clamp(11px,2vw,15px); line-height:1; padding:4px 5px; margin:0; cursor:pointer;
+    background:var(--bg); color:var(--c); border:1px solid var(--c); box-shadow:0 0 8px var(--c); }
+  .hs:hover, .hs:focus-visible, .hs[aria-pressed="true"] { background:var(--c); color:var(--bg); outline:none; z-index:2; }
+  @media (prefers-reduced-motion: no-preference) { .hs[aria-pressed="true"] { animation:hspulse 1.4s ease-in-out infinite; } }
+  @keyframes hspulse { 50% { box-shadow:0 0 14px var(--c), 0 0 0 3px var(--bg); } }
+
+  .mm-map { position:relative; background:rgba(8,10,9,.92); border:1px solid var(--dim); width:100%; max-width:760px; aspect-ratio:3/2; margin:0 auto 14px; }
+  #mm-cv { position:absolute; inset:0; }
+  .node { position:absolute; transform:translate(-50%,-50%); display:block; background:var(--bg); border:0; padding:2px; margin:0; cursor:pointer;
+    font:inherit; font-size:clamp(9px,1.9vw,14px); line-height:1.15; white-space:pre; text-align:left; color:var(--hi); }
+  .node .ln { display:block; color:var(--c); }
+  .node .ln b { font-weight:normal; color:var(--c); }
+  .node .ln i { font-style:normal; color:var(--hi); }
+  .node:hover, .node:focus-visible, .node[aria-pressed="true"] { background:color-mix(in srgb, var(--c) 30%, var(--bg)); outline:none; text-shadow:0 0 8px var(--c); z-index:2; }
+  .node.centre { cursor:default; color:var(--fg); text-shadow:0 0 8px var(--fg); pointer-events:none; }
+  @media (max-width:640px) { .mm-map { aspect-ratio:4/5; } }
 </style>
-<link rel="stylesheet" href="lib/glass.css">
 </head>
 <body>
 <canvas id="bg" aria-hidden="true"></canvas>
 <main>
-<pre class="logo" aria-label="SID">
+<pre class="logo" aria-label="Sid's walking gallery">
  ___ ___ ___
 / __|_ _|   \
-\__ \| || |) |
-|___/___|___/   .ascii
+\__ \| || |) |   walking gallery
+|___/___|___/   semester work
 </pre>
-<section class="panel">
-  <h2>hello</h2>
-  <p>I build small tools, games and video experiments. <span class="cursor">Move the mouse. Click the background.</span></p>
-  <p class="hint">hover a project to change the world behind it.</p>
-</section>
-<section class="panel">
-  <h2>effects</h2>
-  <div id="fx">
-    <button data-mode="waves" aria-pressed="true">waves</button>
-    <button data-mode="pixels" aria-pressed="false">ascii pixels</button>
-    <button data-mode="water" aria-pressed="false">hover water</button>
-    <button data-mode="trail" aria-pressed="false">image trail</button>
-    <button data-mode="grid" aria-pressed="false">box grid</button>
-    <label>use my image<input id="pic" type="file" accept="image/*"></label>
+
+<nav id="walk" aria-label="Gallery rooms">
+  <div class="stops">
+    <a href="#gallery">1 gallery</a>
+    <a href="#photovoice">2 photovoice</a>
+    <a href="#mindmap">3 mind-map</a>
+    <a href="#artefact">4 artefact</a>
   </div>
-  <p class="hint" style="margin-top:8px">ascii pixels: move the mouse to push the light. Upload an image to see it as ASCII (stays in your browser).</p>
+  <div class="track" aria-hidden="true"><span class="walker">\o/</span></div>
+  <p class="hint">walk with the arrow keys, A / D, or the links. each room changes the world behind it.</p>
+</nav>
+
+<!-- ============ 1. GALLERY ============ -->
+<section class="room" id="gallery" aria-labelledby="h-gallery">
+  <h2 id="h-gallery">room 1: gallery</h2>
+  <p class="intro">One example from each main activity across Visual Arts and Media Arts. Each caption links the work to course theory (workshops and readings).</p>
+
+  <h3>// visual arts</h3>
+  <figure class="work">
+    <div class="frame multi"><img src="img/feel-1.jpg" alt="Pastel drawing of a swirling blue, orange and green oval" loading="lazy"><img src="img/feel-2.jpg" alt="Pastel drawing: deep blue fading to light blue and yellow" loading="lazy"></div>
+    <figcaption>
+      <b>Drawing how we feel</b> <span class="topic">topic 1</span>
+      <p><b>Format and modality:</b> pastel drawings on paper (visual arts, 2D). I listened to music and drew how it made me feel, using colour and line instead of objects. In the first drawing, blue, orange and green swirl around an oval. In the second, deep blue fades into light blue and yellow. [add: the piece of music, and what each colour meant to you]</p>
+      <p class="theory">theory: Dinham (2023, p. 383-384) describes expressionism as using colour, line and distortion to carry emotion, and lists drawing or painting a response to music as a classroom starting point. I would use this with students who find it hard to talk about feelings, because the drawing lets them show it first.</p>
+    </figcaption>
+  </figure>
+  <figure class="work">
+    <div class="frame"><img src="img/print-1.jpg" alt="Blue paint strokes from dark to light, arranged symmetrically" loading="lazy"></div>
+    <figcaption>
+      <b>Printmaking</b> <span class="topic">topic 2</span>
+      <p><b>Format and modality:</b> blue paint on paper, arranged symmetrically in strokes from dark to light (visual arts, [printmaking / painting: confirm]). [add: the technique and tools you used, and how the idea came about]</p>
+      <p class="theory">theory: The pattern lesson in Dinham (2023, p. 177-180) varies tools and processes, such as rubbings, printing and painting, and builds pattern from repeated shapes and lines. My piece uses repetition and symmetry in the same way. For Topic 2, Smilan (2017) and Dinham (p. 50) both warn against copying a style without learning the artist and culture behind it, so I would teach the context first.</p>
+    </figcaption>
+  </figure>
+  <figure class="work">
+    <div class="frame multi"><img src="img/gallery-1.jpg" alt="Laminated sheet of Curiosity prompt cards for looking at art" loading="lazy"><img src="img/gallery-2.jpg" alt="Gallery installation: an upside-down tree over a pile of ceramic leaves" loading="lazy"></div>
+    <figcaption>
+      <b>Gallery</b> <span class="topic">topic 3</span>
+      <p><b>Format and modality:</b> a gallery visit (visual arts, responding). The first image is a laminated sheet of Curiosity prompt cards for looking at art. The second is an installation of an upside-down tree over a pile of ceramic leaves. [add: the gallery, the artist, and what you noticed]</p>
+      <p class="theory">theory: Dinham (2023, p. 126 and 392) describes guided viewing as a series of questions that move from describing the work, to its formal qualities and context, to a personal response and a judgement. The prompt cards work the same way. I would also always give students the artist's name, the title and some context (p. 389).</p>
+    </figcaption>
+  </figure>
+  <figure class="work">
+    <div class="frame multi"><img src="img/sculpt-1.jpg" alt="Cardboard and paper sculpture: green corrugated discs on a twig, next to a paper tree" loading="lazy"><img src="img/soap-1.jpg" alt="Face carved into a bar of soap" loading="lazy"><img src="img/soap-2.jpg" alt="Carved soap face, lit from behind" loading="lazy"></div>
+    <figcaption>
+      <b>Sculpture: cardboard and soap carving</b> <span class="topic">topic 4</span>
+      <p><b>Format and modality:</b> sculpture in cardboard, paper and soap (visual arts, 3D). The cardboard piece has green corrugated discs on a twig next to a paper tree. The soap piece is a face carved into a bar and lit from behind. [add: how each idea came about, and the tools you used]</p>
+      <p class="theory">theory: Dinham (2023, p. 387-388) says working in 3D invites students to explore space and form, using cheap, low-tech materials such as cardboard and found objects. It also says materials carry meaning (p. 386). In class I would use recycled cardboard and ask students why they chose their material.</p>
+    </figcaption>
+  </figure>
+  <figure class="work">
+    <div class="frame"><img src="img/identity-1.jpg" alt="Felt, pipe-cleaner and clay carrot figure with a note: "I haven't got the words"" loading="lazy"></div>
+    <figcaption>
+      <b>3D object that represents identity</b> <span class="topic">topic 5</span>
+      <p><b>Format and modality:</b> a figure made from felt, pipe cleaner and clay, in the shape of a carrot, with a note that says "I haven't got the words" (visual arts, mixed-media 3D). [add: what the carrot, each material and the note stand for]</p>
+      <p class="theory">theory: Dinham (2023, p. 89) says the arts let students explore who they are by building a personal representation from significant images and objects. Metaphor lets students approach personal ideas indirectly and safely (p. 103-104). Vahter (2012) says an art classroom should balance making with responding, so I would end this task with students explaining what their object stands for.</p>
+    </figcaption>
+  </figure>
+
+  <h3>// media arts</h3>
+  <figure class="work">
+    <div class="frame"><img src="img/album-1.jpg" alt="Black-and-white paper collage with a red "Sports Coach" label, a skier and a volleyball" loading="lazy"></div>
+    <figcaption>
+      <b>Collage: album cover</b> <span class="topic">topic 6</span>
+      <p><b>Format and modality:</b> paper collage on dark card (media arts, print media). It is black and white with one red cut-out title, SPORTS COACH. I used a skier, a volleyball and torn newsprint. The red title is the only colour, so it is the first thing a viewer reads. The Media Arts artefact page breaks this piece down in full.</p>
+      <p class="theory">theory: Dinham (2023, p. 308 and 310) lists alignment, repetition and consistency, balance, unity, contrast and white space as the principles of layout, and says a cover should signal what is inside through its image, colour and layout.</p>
+    </figcaption>
+  </figure>
+  <figure class="work">
+    <div class="frame"><img src="img/story-1.jpg" alt="Four comic panels with dotted figures and coloured ribbons of path" loading="lazy"></div>
+    <figcaption>
+      <b>Pictorial stories</b> <span class="topic">topic 7</span>
+      <p><b>Format and modality:</b> a four-panel comic (media arts, pictorial story). The figures are dots and the path is shown as coloured ribbons. [add: what the story is about, and why you used dots and ribbons instead of drawn characters]</p>
+      <p class="theory">theory: Dinham (2023, p. 297-298) says comics have their own codes and conventions, such as word balloons and symbols for emotion, and that the link between image and text builds literacy. My comic uses symbols in place of characters, so the reader has to interpret the meaning.</p>
+    </figcaption>
+  </figure>
+  <figure class="work">
+    <div class="frame"><img src="img/photostory-w7.jpg" alt="Photo story: collage of photos from a walk along a creek and a bridge path" loading="lazy"></div>
+    <figcaption>
+      <b>Photo story (week 7)</b> <span class="topic">topic 7</span>
+      <p><b>Format and modality:</b> a photo collage from a walk along a creek and a bridge path (media arts, photographic story). [add: which photos you chose as the key images, and why]</p>
+      <p class="theory">theory: Dinham (2023, p. 296) says photographic stories work by choosing what is significant and showing it in the layout, for example by placing the key image in the centre or making it larger than the rest.</p>
+    </figcaption>
+  </figure>
+  <figure class="work">
+    <div class="frame multi"><video src="img/stopmotion-1.mp4" controls muted loop playsinline preload="metadata"></video><video src="img/stopmotion-2.mp4" controls muted loop playsinline preload="metadata"></video></div>
+    <figcaption>
+      <b>Stop-motion</b> <span class="topic">topic 8</span>
+      <p><b>Format and modality:</b> two stop-motion videos (media arts, audio-visual). [add: what each video shows, the materials, and how you planned it]</p>
+      <p class="theory">theory: Dinham (2023, p. 302-303) describes stop-motion as a series of still images where the movement advances a small step each frame, so it appears to move when played at speed. It suggests using animation to introduce film conventions and terminology, and a storyboard worksheet to plan the sequence (p. 299).</p>
+    </figcaption>
+  </figure>
+  <figure class="work">
+    <div class="frame empty"><span class="ph">audio coming soon</span></div>
+    <figcaption>
+      <b>Podcast / storybook audio</b> <span class="topic">topic 9</span>
+      <p><b>Format and modality:</b> not made yet (media arts, audio). [plan: the topic, the format (interview, story or radio drama), and who it is for]</p>
+      <p class="theory">theory: Dinham (2023, p. 300-301) says podcasts let students work in teams on scripts and can be used to reflect on a finished arts activity. Copyright-free "podsafe" music avoids copyright problems.</p>
+    </figcaption>
+  </figure>
+  <figure class="work">
+    <div class="frame"><img src="img/game-1.jpg" alt="Scratch editor showing code blocks and a cat sprite meeting a bat underwater" loading="lazy"></div>
+    <figcaption>
+      <b>Gaming</b> <span class="topic">topic 10</span>
+      <p><b>Format and modality:</b> a Scratch project (media arts, interactive). The screenshot shows code blocks and a cat sprite meeting a bat underwater. [add: the objective of your game, and what choices the player makes]</p>
+      <p class="theory">theory: Dinham (2023, p. 311) says every game has an objective and a story, and lists planning questions such as who it is for, the rewards, the risks and the challenges. Interactivity means the player can act on the work (p. 311-312).</p>
+    </figcaption>
+  </figure>
+  <h3>// summary</h3>
+  <p>Draft: I believe the arts are learned by making, reflecting, and connecting to other people's work. This semester I moved between visual arts and media arts, and each piece followed the same four steps: invent an idea, make it, connect it to an artist or theory, and reflect on it (Dinham, 2023, p. 39-43). Reflecting on my own art-making also builds metacognition, which means knowing how I learn (p. 106). [edit in your own words, and add what you would teach differently]</p>
+  <p class="hint">add or remove frames so there is one per main activity.</p>
 </section>
-<section class="panel">
-  <h2>projects</h2>
-  <ul id="projects">
-    <li><a href="#" data-mode="waves">Marble Races <span>// live race server + viewer</span></a></li>
-    <li><a href="#" data-mode="rain">VFX Pipeline <span>// tracked-marker effects on phone clips</span></a></li>
-    <li><a href="#" data-mode="stars">Sound of Sorting <span>// sorting algorithms you can hear</span></a></li>
-    <li><a href="#" data-mode="fire">Life Map <span>// a map of a life</span></a></li>
+
+<!-- ============ 2. PHOTOVOICE ============ -->
+<section class="room" id="photovoice" aria-labelledby="h-photovoice">
+  <h2 id="h-photovoice">room 2: photovoice</h2>
+  <p class="intro">One photo that shows my teaching philosophy and values, with one supporting sentence.</p>
+  <figure class="work big">
+    <div class="frame"><img src="img/photovoice.jpg" alt="Two poppies, one pink and one orange, against a purple background, each with a bee inside" onerror="this.parentNode.classList.add('empty')"><span class="ph">img/photovoice.jpg</span></div>
+    <figcaption><p class="quote">"Like these two poppies, we each open at our own pace, and just as the bees carry pollen between flowers, we grow more when we share what we know."</p></figcaption>
+  </figure>
+</section>
+
+<!-- ============ 3. MIND-MAP ============ -->
+<section class="room" id="mindmap" aria-labelledby="h-mindmap">
+  <h2 id="h-mindmap">room 3: mind-map</h2>
+  <p class="intro">A brainstorm of what a Media Arts lesson needs, here an album cover design lesson built on collage. It is not a full lesson plan.</p>
+  <div class="mm" id="mm">
+    <div class="mm-map" id="mm-map" role="group" aria-label="Mind-map: album cover design lesson, drawn as a network">
+      <canvas id="mm-cv" aria-hidden="true"></canvas>
+    </div>
+    <div class="mm-detail" id="mm-detail" aria-live="polite"></div>
+    <p class="hint">left: what you bring. right: what happens in the lesson. click a node to open it; signals travel along the connections.</p>
+  </div>
+  <script>
+  // ASCII neural-network mind-map: spoke + ring connections drawn as characters on a canvas, pulses travel along them.
+  (() => {
+    const D = {
+      materials: ['Materials / Resources', ['Magazines, newspaper, scissors, glue, coloured paper and a plain A4/A3 square base', 'Canva (or similar) with an album-cover template for a digital option', 'Real album covers from different genres as examples, printed or on screen', 'Design principles poster: alignment, repetition and consistency, balance, unity, contrast, white space']],
+      outcomes: ['Learning Outcomes', ['Name the codes and conventions of a cover: title and artist placement, hierarchy, image, colour, genre cues', 'Use the design principles on purpose when making a cover', 'Explain how audience and representation shaped their choices (the five media arts concepts)', 'Achievement standard (end of Year 6): students explain how media languages and media technologies are used in media arts works they make or experience.']],
+      curriculum: ['Curriculum Links (Australian Curriculum v9, The Arts: Media Arts, Years 5-6)', [
+        'AC9AMA6E01 Exploring and responding: explore how media languages and technologies are used in media arts across cultures, times and places. In the lesson: compare how covers signal a genre.',
+        'AC9AMA6D01 Developing practices and skills: develop production skills to communicate ideas through images, text and media technologies. In the lesson: experiment with layout, typography and genre conventions.',
+        'AC9AMA6C01 Creating and making: use media languages, technologies and production processes to make works for specific audiences. In the lesson: design a cover for a chosen audience.',
+        'AC9AMA6P01 Presenting and performing: present work using responsible media practice. In the lesson: gallery walk, and acknowledging where collage images came from.',
+        'Optional AC9AMA6E02: how First Nations Australians use media arts to continue and revitalise cultures. Use a cover by a First Nations artist as a case study, following cultural protocols (links to Topic 2).',
+        'Cross-curriculum: English (audience, purpose, multimodal texts), Digital Technologies (Canva). ACARA lists "media consumers and creators" as a connection across Media Arts, English and Digital Technologies.',
+        'Years 3-4 version: AC9AMA4E01, AC9AMA4C01 (collage zine) and AC9AMA4P01 (layout for an audience).'
+      ]],
+      sequence: ['Lesson Sequence', ['Hook: cover only, no sound. Guess the genre and say what gave it away', 'Teach the principles with two real covers: what is aligned, repeated, balanced, contrasting', 'Plan a cover for a song, album or story that matters to them (thumbnail sketch)', 'Make it: collage on paper or build it in Canva', 'Gallery walk: classmates guess the genre and name one principle they can see']],
+      inclusivity: ['Inclusivity', ['Choice of paper collage, drawing or digital, so every student has a way in', 'Students pick the music or story, drawing on their own culture and interests', 'Differentiate the what, how, why and where of the task (Taylor, 2021)', 'Sentence starters and a principles checklist; partner talk before writing']],
+      assessment: ['Assessment', ['Formative: check the thumbnail sketch, ask "which principle is doing the most work here?"', 'Summative: finished cover against a rubric based on the design principles', 'Short reflection: what I chose, why, and what I would change (responding)', 'Viewpoints-style questions from the curriculum, e.g. "What is working well in my cover?" and "Which areas do I need to improve?"']]
+    };
+    // x,y are percentages of the map; colours are the original six, lightened a little for the dark page
+    const N = [
+      { k: 'materials', t: 'Materials', c: '#12a9cf', x: 14, y: 16, side: 'L' },
+      { k: 'curriculum', t: 'Curriculum', c: '#d9ae1f', x: 14, y: 50, side: 'L' },
+      { k: 'inclusivity', t: 'Inclusivity', c: '#6464e0', x: 14, y: 84, side: 'L' },
+      { k: 'outcomes', t: 'Outcomes', c: '#22a85d', x: 86, y: 16, side: 'R' },
+      { k: 'sequence', t: 'Sequence', c: '#d42f23', x: 86, y: 50, side: 'R' },
+      { k: 'assessment', t: 'Assessment', c: '#d41e86', x: 86, y: 84, side: 'R' }
+    ];
+    const C = { x: 50, y: 50, c: '#7dffb2' };
+    const map = document.getElementById('mm-map'), cv = document.getElementById('mm-cv'), ctx = cv.getContext('2d');
+    const box = document.getElementById('mm-detail');
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function mk(tag, cls, parent) { const e = document.createElement(tag); if (cls) e.className = cls; parent.appendChild(e); return e; }
+    function ln(parent, left, mid, right, c, w) {
+      const l = mk('span', 'ln', parent); l.style.setProperty('--c', c);
+      if (mid === null) { l.textContent = left + '-'.repeat(w) + right; return; }
+      mk('b', '', l).textContent = left; mk('i', '', l).textContent = ' ' + mid + ' '; mk('b', '', l).textContent = right;
+    }
+    function node(n) {
+      const b = mk('button', 'node', map); b.dataset.b = n.k; b.setAttribute('aria-label', D[n.k][0]);
+      b.style.cssText = `left:${n.x}%;top:${n.y}%;--c:${n.c}`;
+      const w = n.t.length + 2;
+      ln(b, '.', null, '.', n.c, w); ln(b, '|', n.t, '|', n.c); ln(b, "'", null, "'", n.c, w);
+      n.el = b; b.addEventListener('click', () => show(n.k));
+    }
+    N.forEach(node);
+    const cn = mk('div', 'node centre', map); cn.style.cssText = `left:${C.x}%;top:${C.y}%;--c:${C.c}`;
+    ['.==============.', '|  ALBUM COVER |', '|    design    |', '| (Years 5-6)  |', "'=============='"].forEach(t => { mk('span', 'ln', cn).textContent = t; });
+
+    function show(k) {
+      N.forEach(n => n.el.setAttribute('aria-pressed', String(n.k === k)));
+      sel = k;
+      const [title, items] = D[k], n = N.find(m => m.k === k);
+      box.style.setProperty('--c', n.c);
+      box.innerHTML = '<h4></h4><ul class="plain"></ul>';
+      box.querySelector('h4').textContent = title;
+      items.forEach(t => { const li = document.createElement('li'); li.textContent = t; box.querySelector('ul').appendChild(li); });
+    }
+    let sel = 'sequence';
+
+    // ----- connections -----
+    const edges = [];
+    // layers like a neural network: what you bring (left) -> topic (centre) -> what happens (right), plus faint skip connections
+    const Ls = N.filter(n => n.side === 'L'), Rs = N.filter(n => n.side === 'R');
+    Ls.forEach((l, i) => Rs.forEach((r, j) => { if (i !== j) edges.push({ a: l, b: r, c: '#3fa56f', spoke: false }); }));
+    Ls.forEach(n => edges.push({ a: n, b: C, c: n.c, k: n.k, spoke: true }));
+    Rs.forEach(n => edges.push({ a: C, b: n, c: n.c, k: n.k, spoke: true }));
+    let W = 0, H = 0, cw = 7, chh = 14, t0 = performance.now();
+    function size() {
+      const r = map.getBoundingClientRect(); if (!r.width) return;
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      cv.width = r.width * dpr; cv.height = r.height * dpr; cv.style.width = r.width + 'px'; cv.style.height = r.height + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.font = '12px ui-monospace, Consolas, Menlo, monospace'; ctx.textBaseline = 'top';
+      cw = ctx.measureText('M').width; W = r.width; H = r.height;
+      edges.forEach(e => {
+        const x0 = e.a.x / 100 * W / cw, y0 = e.a.y / 100 * H / chh, x1 = e.b.x / 100 * W / cw, y1 = e.b.y / 100 * H / chh;
+        const n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0)) | 0, dx = (x1 - x0) * cw, dy = (y1 - y0) * chh;
+        const ang = Math.abs(Math.atan2(dy, dx)); let ch;
+        if (ang < .3 || ang > Math.PI - .3) ch = '-'; else if (Math.abs(ang - Math.PI / 2) < .3) ch = '|'; else ch = dx * dy > 0 ? '\\' : '/';
+        e.cells = []; for (let i = 0; i <= n; i++) e.cells.push([Math.round(x0 + (x1 - x0) * i / n), Math.round(y0 + (y1 - y0) * i / n)]);
+        e.ch = ch;
+      });
+    }
+    function put(ch, c, a, cell) { ctx.globalAlpha = a; ctx.fillStyle = c; ctx.fillText(ch, cell[0] * cw, cell[1] * chh); }
+    function frame(now) {
+      requestAnimationFrame(frame);
+      if (!map.offsetParent) return;
+      const r = map.getBoundingClientRect(); if (Math.abs(r.width - W) > 1) size();
+      if (!W) return;
+      const t = reduce ? 0 : (now - t0) / 1000;
+      ctx.clearRect(0, 0, W, H);
+      edges.forEach((e, ei) => {
+        const on = e.spoke && e.k === sel;
+        e.cells.forEach(c => put(e.ch, e.c, on ? .95 : e.spoke ? .7 : .5, c));
+        const mid = e.cells[e.cells.length >> 1]; put('O', e.c, on ? 1 : .7, mid);
+        if (reduce) return;
+        const L = e.cells.length, spd = on ? .35 : .16;
+        for (let p = 0; p < 2; p++) {
+          const pos = ((t * spd + ei * .17 + p * .5) % 1) * (L - 1) | 0;
+          [['@', 1], ['o', .65], ['.', .35]].forEach(([ch, a], k) => { const c = e.cells[pos - k]; if (c) put(ch, on || e.spoke ? '#eafff2' : '#7dffb2', a, c); });
+        }
+      });
+      ctx.globalAlpha = 1;
+    }
+    addEventListener('resize', size);
+    show('sequence'); size(); requestAnimationFrame(frame);
+  })();
+  </script>
+  <h3>// design and layout choices</h3>
+  <p>Draft: The topic sits in the centre of a network, with six branches placed symmetrically around it so the map feels balanced. Every branch node is the same size and the connections are the same weight, which keeps the alignment tidy and shows that each part of the lesson matters equally. Repeating the same node shape and one colour per branch gives consistency and unity, and helps a teacher find a section quickly. Open space (white space) between the nodes lets each idea stand alone, and the lit-up branch gives contrast so the eye knows where to look. These are the same principles the lesson teaches students for cover design. [edit in your own words]</p>
+</section>
+
+<!-- ============ 4. ARTEFACT ============ -->
+<section class="room" id="artefact" aria-labelledby="h-artefact">
+  <h2 id="h-artefact">room 4: media arts artefact</h2>
+  <p class="intro">Chosen activity: <b>print-media cover design (album cover collage)</b></p>
+  <figure class="art" id="art">
+    <div class="frame">
+      <div class="hs-wrap" id="hs-wrap"><img src="img/album-1.jpg" alt="Collage cover titled SPORTS COACH: torn black-and-white magazine pieces of skiers, a diver and a volleyball on a dark blue-grey background, with a red cut-out title in the bottom left."></div>
+    </div>
+    <div class="mm-detail" id="hs-detail" aria-live="polite"></div>
+    <p class="hint">click a numbered marker to see how that part of the cover uses a design principle or media arts concept. this is a teacher exemplar for the lesson in the mind-map.</p>
+  </figure>
+  <script>
+  (() => {
+    // x,y are percentages of the image. [title, c, x, y, [points]]
+    const H = [
+      ['Hierarchy and written code', '#d42f23', 20, 86, ['The cut-out SPORTS COACH title is the only red on the page, so contrast pulls the eye there first and tells the audience what the cover is about.', 'Heavy sans-serif lettering is a convention of sports media: it reads as bold and energetic.', 'Course link: Topic 6 lecture (contrast, alignment); Dezuanni, languages, codes and conventions.']],
+      ['Focal point and balance', '#12a9cf', 50, 62, ['The volleyball is the largest, most central shape. The torn paper edges and the skier lead the eye towards it.', 'The title (bottom left) is balanced by the hands (bottom right), so the cover feels weighted evenly even though it is not symmetrical.', 'Course link: Topic 6 lecture (balance).']],
+      ['Symbolic and technical codes', '#d9ae1f', 50, 38, ['The skier is rotated upside down and overlapped onto the ball. An unusual angle signals movement, energy and risk.', 'Choosing sports images to stand for "coaching" is a symbolic code: the audience reads the meaning from the pictures, not just the words.', 'Course link: Dezuanni, representation and codes; the lesson asks students what a choice of image says about the music or story.']],
+      ['Repetition and consistency', '#22a85d', 78, 17, ['A second skier repeats the sport theme, and the long diagonal of the paper strip echoes the diagonal of the first skier.', 'Repeated subject, repeated diagonal and repeated torn edges give the cover a consistent look.', 'Course link: Topic 6 lecture (repetition and consistency).']],
+      ['Texture and print-media conventions', '#d41e86', 20, 35, ['Torn newsprint with real text fragments shows the print-media convention of layered paper, and the visible words add a written code about coaching.', 'The rough edges are a collage technique that students can try with only scissors, glue and magazines.', 'Course link: Topic 6 print-media cover design activity (Arts Live, Canva for a digital version).']],
+      ['Unity, white space and audience', '#6464e0', 10, 12, ['One cool blue-grey palette ties very different pieces together (unity). Only the title breaks it.', 'The dark areas are white space: they give the eye a place to rest and keep the layers from feeling crowded.', 'Audience and representation: the cover is aimed at coaches, players and teachers. Dezuanni\'s concepts of audience and representation ask who this is for and who is shown.']]
+    ];
+    const wrap = document.getElementById('hs-wrap'), box = document.getElementById('hs-detail'), btns = [];
+    function show(i) {
+      btns.forEach((b, j) => b.setAttribute('aria-pressed', String(i === j)));
+      const [t, c, , , pts] = H[i];
+      box.style.setProperty('--c', c);
+      box.innerHTML = '<h4></h4><ul class="plain"></ul>';
+      box.querySelector('h4').textContent = (i + 1) + '. ' + t;
+      pts.forEach(p => { const li = document.createElement('li'); li.textContent = p; box.querySelector('ul').appendChild(li); });
+    }
+    H.forEach(([t, c, x, y], i) => {
+      const b = document.createElement('button'); b.className = 'hs'; b.type = 'button';
+      b.style.cssText = `left:${x}%;top:${y}%;--c:${c}`; b.textContent = '[' + (i + 1) + ']';
+      b.setAttribute('aria-label', (i + 1) + ': ' + t);
+      b.addEventListener('click', () => show(i));
+      wrap.appendChild(b); btns.push(b);
+    });
+    show(0);
+  })();
+  </script>
+
+  <h3>// codes and conventions</h3>
+  <ul class="plain">
+    <li><b>Technical codes:</b> layering and overlap, unusual angle (the upside-down skier), scale (the ball is the largest piece), a limited colour palette, bold sans-serif title.</li>
+    <li><b>Symbolic codes:</b> sports images stand for coaching and movement; the single red title signals importance; the torn edges suggest energy and effort.</li>
+    <li><b>Written codes:</b> the SPORTS COACH title and fragments of real newsprint text.</li>
+    <li><b>Conventions:</b> a square cover format, the title placed where it can be read first, and a main image that tells the audience the genre. [add: how a real album cover would also show an artist name]</li>
   </ul>
+
+  <h3>// in future teaching</h3>
+  <ul class="plain">
+    <li><b>Curriculum:</b> Australian Curriculum v9, The Arts: Media Arts, Years 5-6 (source: ACARA Media Arts F-6 content document). Exploring and responding <b>AC9AMA6E01</b> (how media languages and technologies are used across contexts), Developing practices and skills <b>AC9AMA6D01</b> (production skills to communicate ideas), Creating and making <b>AC9AMA6C01</b> (making works for specific audiences) and Presenting and performing <b>AC9AMA6P01</b> (responsible media practice). The cover supports the Year 6 achievement standard: explaining how media languages and technologies are used in works students make or experience.</li>
+    <li><b>Adapting for age and ability:</b> Years 3-4 use <b>AC9AMA4E01</b> (comparing works made for different purposes and their conventions), <b>AC9AMA4C01</b> (the curriculum's own example is a collaged zine of images, text and drawings) and <b>AC9AMA4P01</b> (laying out a print piece with audience in mind). Younger students make a collage and name two things they see; older students annotate the principles and justify choices for a chosen audience. The Canva version supports students who find cutting hard.</li>
+    <li><b>Within a unit:</b> [Draft: before, a lesson on the five media arts concepts and the design principles; after, students compare covers in a gallery walk and write a short reflection. Edit to match your unit.]</li>
+    <li><b>Topics it can cover:</b> Cross-curriculum links: English (audience, purpose, multimodal texts) and Digital Technologies (Canva), which ACARA groups with Media Arts under "media consumers and creators". Optional <b>AC9AMA6E02</b> case study of a cover by a First Nations artist, with cultural protocols (links to Topic 2). Other themes: identity, culture, the sport or music a student chooses.</li>
+  </ul>
+  <p class="hint">the sample paragraph in the video shows roughly how much to write.</p>
 </section>
-<section class="panel">
-  <h2>contact</h2>
-  <p><a href="#" style="color:var(--fg)">add your link here</a></p>
-</section>
+
 </main>
+<script>
+// walking gallery: hash routing, arrow-key walking, a different background effect per room
+(() => {
+  const rooms = ['gallery', 'photovoice', 'mindmap', 'artefact'];
+  const links = [...document.querySelectorAll('#walk .stops a')];
+  const walker = document.querySelector('.walker');
+  let cur = -1;
+  function go(i, push) {
+    i = Math.max(0, Math.min(rooms.length - 1, i));
+    if (i === cur) return;
+    cur = i;
+    rooms.forEach((r, k) => document.getElementById(r).hidden = k !== i);
+    links.forEach((a, k) => a.setAttribute('aria-current', k === i ? 'page' : 'false'));
+    walker.style.left = (i / (rooms.length - 1) * 100) + '%';
+    walker.style.setProperty('--shift', (i / (rooms.length - 1) * -100) + '%');
+    walker.classList.remove('step'); void walker.offsetWidth; walker.classList.add('step');
+    if (push) history.replaceState(null, '', '#' + rooms[i]);
+    if (window.setBgMode) setBgMode({ photovoice: 'garden', mindmap: 'network', artefact: 'collage' }[rooms[i]] || 'waves');
+    scrollTo({ top: 0 });
+  }
+  const fromHash = () => { const i = rooms.indexOf(location.hash.slice(1)); go(i < 0 ? 0 : i, false); };
+  addEventListener('hashchange', fromHash);
+  addEventListener('keydown', e => {
+    if (e.target.closest('input, textarea, button, summary') || e.altKey || e.ctrlKey || e.metaKey) return;
+    if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') go(cur + 1, true);
+    if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') go(cur - 1, true);
+  });
+  window.addEventListener('load', fromHash);
+})();
+</script>
 <script>
 (() => {
   const cv = document.getElementById('bg'), ctx = cv.getContext('2d');
@@ -98,11 +458,6 @@
   addEventListener('pointerdown', e => {
     if (e.target.closest('main')) return;
     ripples.push({ x: e.clientX / CELL_W, y: e.clientY / CELL_H, t: performance.now() });
-  });
-  document.querySelectorAll('#projects a').forEach(a => {
-    const set = () => { setMode(a.dataset.mode); };
-    a.addEventListener('mouseenter', set); a.addEventListener('focus', set);
-    a.addEventListener('click', e => e.preventDefault());
   });
 
   function field(x, y, t) {
@@ -129,106 +484,115 @@
   }
 
 
-  // ---------- extra effects ----------
-  const R = {};
-  const off = document.createElement('canvas'), octx = off.getContext('2d', { willReadFrequently: true });
-  let userImg = null;
-  const RAMP2 = ' .:-=+*#%@';
-  document.getElementById('pic').addEventListener('change', e => {
-    const f = e.target.files[0]; if (!f) return;
-    const img = new Image(); img.onload = () => { userImg = img; setMode('pixels'); }; img.src = URL.createObjectURL(f);
-  });
-  function setMode(m) {
-    mode = m;
-    document.querySelectorAll('#fx button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === m)));
+  // ---------- garden (photovoice room): ascii flowers sway, little bees fly between them ----------
+  const HEADS = [[' \\|/ ', '-(@)-', ' /|\\ '], [' .*. ', '*(O)*', " '*' "], [' ,@, ', '(@@@)', " `@' "]];
+  const PETAL = ['#ff8fa3', '#ff9a45', '#ff6f91', '#ffb347'];
+  let flowers = [], gKey = '', gStart = performance.now();
+  function buildGarden() {
+    gKey = cols + 'x' + rows; flowers = [];
+    const n = Math.max(6, Math.round(cols / 11));
+    for (let i = 0; i < n; i++) flowers.push({ x: 3 + Math.round((i + (Math.sin(i * 12.9) * .5 + .5) * .7) * (cols - 6) / n),
+      h: Math.round(rows * (.22 + (Math.sin(i * 7.7) * .5 + .5) * .3)), ph: i * 1.7, head: i % 3, col: PETAL[i % 4] });
   }
-  document.querySelectorAll('#fx button').forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
+  function drawGarden(t, now) {
+    if (gKey !== cols + 'x' + rows) buildGarden();
+    const grow = reduce ? 1 : Math.min(1, (now - gStart) / 2800), e = 1 - Math.pow(1 - grow, 3), base = rows - 1;
+    ctx.fillStyle = 'rgba(125,255,178,.35)';
+    for (let x = 0; x < cols; x++) if ((x * 7 + Math.floor(t * 1.5 + x)) % 5 < 2) ctx.fillText('"', x * CELL_W, base * CELL_H);
+    const tops = flowers.map(f => {
+      const h = Math.max(1, Math.round(f.h * e)), sway = Math.sin(t * .8 + f.ph) * 2.6;
+      let px = f.x;
+      for (let j = 1; j <= h; j++) {
+        const u = j / f.h, off = Math.round(sway * u * u), nx = f.x + off;
+        ctx.fillStyle = 'rgba(125,255,178,.6)';
+        ctx.fillText(nx > px ? '/' : nx < px ? '\\' : '|', nx * CELL_W, (base - j) * CELL_H);
+        if (j % 6 === 3) { ctx.fillStyle = 'rgba(125,255,178,.45)'; ctx.fillText(j % 12 === 3 ? '~' : '~', (nx + (j % 12 === 3 ? 1 : -1)) * CELL_W, (base - j) * CELL_H); }
+        px = nx;
+      }
+      const tx = f.x + Math.round(sway), ty = base - h;
+      if (grow > .8) HEADS[f.head].forEach((row, r) => [...row].forEach((ch, c) => {
+        if (ch === ' ') return;
+        ctx.fillStyle = r === 1 && c === 2 ? '#ffd84d' : f.col;
+        ctx.fillText(ch, (tx - 2 + c) * CELL_W, (ty - 1 + r) * CELL_H);
+      }));
+      return { x: tx, y: ty };
+    });
+    if (grow < .9) return;
+    const n = flowers.length;
+    for (let b = 0; b < 7; b++) {
+      const s = t / 7 + b * .41, k = Math.floor(s), f = s - k, a = tops[(k * 3 + b) % n], c = tops[(k * 3 + 3 + b) % n];
+      const go = Math.max(0, (f - .55) / .45), m = go * go * (3 - 2 * go);
+      let x = a.x + (c.x - a.x) * m, y = a.y + (c.y - a.y) * m;
+      x += Math.sin(t * 3 + b * 2) * (3.2 - 2.4 * m) + Math.cos(t * 1.3 + b) * .8;
+      y += Math.cos(t * 4 + b * 3) * (1.6 - 1.2 * m) - 1.5 * Math.sin(m * Math.PI);
+      ctx.fillStyle = '#ffd84d';
+      ctx.fillText(Math.floor(t * 12 + b) % 2 ? "'o'" : ',o,', Math.round(x - 1) * CELL_W, Math.round(y) * CELL_H);
+    }
+  }
+  // ---------- network (mind-map room): drifting nodes joined by faint connections, signals travelling along them ----------
+  const NCOL = ['#12a9cf', '#d9ae1f', '#6464e0', '#22a85d', '#d42f23', '#d41e86'];
+  let netN = [], nKey = '';
+  function buildNet() {
+    nKey = cols + 'x' + rows; netN = [];
+    const n = Math.max(10, Math.min(26, Math.round(cols * rows / 480)));
+    for (let i = 0; i < n; i++) netN.push({ fx: .05 + .9 * (Math.sin(i * 12.9) * .5 + .5), fy: .08 + .84 * (Math.sin(i * 7.3 + 1) * .5 + .5),
+      ax: 3 + (i % 4) * 2, ay: 2 + (i % 3) * 1.5, sp: .12 + (i % 5) * .03, ph: i * 1.9, c: NCOL[i % 6] });
+  }
+  function drawNetwork(t) {
+    if (nKey !== cols + 'x' + rows) buildNet();
+    const P = netN.map(n => ({ x: n.fx * cols + Math.sin(t * n.sp + n.ph) * n.ax, y: n.fy * rows + Math.cos(t * n.sp * 1.3 + n.ph) * n.ay, c: n.c }));
+    const maxD = 30;
+    for (let i = 0; i < P.length; i++) for (let j = i + 1; j < P.length; j++) {
+      const a = P[i], b = P[j], dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx * .55, dy);
+      if (d > maxD) continue;
+      const k = Math.max(Math.abs(dx), Math.abs(dy)) | 0; if (k < 2) continue;
+      const ang = Math.abs(Math.atan2(dy * 16, dx * 9)), ch = ang < .3 || ang > Math.PI - .3 ? '-' : Math.abs(ang - Math.PI / 2) < .3 ? '|' : dx * dy > 0 ? '\\' : '/';
+      ctx.fillStyle = `rgba(125,255,178,${.07 + .2 * (1 - d / maxD)})`;
+      for (let s = 1; s < k; s++) ctx.fillText(ch, Math.round(a.x + dx * s / k) * CELL_W, Math.round(a.y + dy * s / k) * CELL_H);
+      if ((i + j) % 3 === 0) {
+        const f = (t * .22 + (i * 7 + j * 3) * .13) % 1;
+        [['@', .7], ['o', .4], ['.', .2]].forEach(([c, al], q) => { const s = Math.round(f * k) - q; if (s < 1 || s >= k) return;
+          ctx.fillStyle = `rgba(234,255,242,${al})`; ctx.fillText(c, Math.round(a.x + dx * s / k) * CELL_W, Math.round(a.y + dy * s / k) * CELL_H); });
+      }
+    }
+    P.forEach(p => { ctx.fillStyle = p.c; ctx.globalAlpha = .75; ctx.fillText('(o)', Math.round(p.x - 1) * CELL_W, Math.round(p.y) * CELL_H); ctx.globalAlpha = 1; });
+  }
 
-  // ascii pixels: draw a source at 1 px per cell, map brightness to characters
-  R.pixels = (t) => {
-    if (off.width !== cols || off.height !== rows) { off.width = cols; off.height = rows; }
-    octx.fillStyle = '#000'; octx.fillRect(0, 0, cols, rows);
-    if (userImg) {
-      const k = Math.max(cols / userImg.width, rows / (userImg.height * (CELL_W / CELL_H)));
-      const w = userImg.width * k, h = userImg.height * k * (CELL_W / CELL_H);
-      octx.drawImage(userImg, (cols - w) / 2, (rows - h) / 2, w, h);
-    } else {
-      const g = (x, y, r, a) => { const gr = octx.createRadialGradient(x, y, 0, x, y, r);
-        gr.addColorStop(0, `rgba(255,255,255,${a})`); gr.addColorStop(1, 'rgba(255,255,255,0)');
-        octx.fillStyle = gr; octx.fillRect(0, 0, cols, rows); };
-      for (let i = 0; i < 5; i++) g(cols * (.5 + .35 * Math.sin(t * .4 + i * 1.7)), rows * (.5 + .35 * Math.cos(t * .5 + i * 2.3)), rows * .5, .9);
+  // ---------- collage (artefact room): torn paper pieces drift and overlap, with cut-out design words ----------
+  const WORDS = ['ALIGN', 'BALANCE', 'CONTRAST', 'SPACE', 'UNITY', 'REPEAT'];
+  const NEWS = 'coach athlete skilled performance principles technique practice develop process resources model sophisticated ';
+  let paper = [], pKey = '';
+  function buildPaper() {
+    pKey = cols + 'x' + rows; paper = [];
+    const n = Math.max(7, Math.min(14, Math.round(cols / 10)));
+    for (let i = 0; i < n; i++) {
+      const word = i % 3 === 2 ? WORDS[(i / 3 | 0) % WORDS.length] : null, r = k => Math.sin(i * k) * .5 + .5;
+      paper.push({ word, w: word ? word.length + 4 : 14 + Math.round(r(3.1) * 16), h: word ? 3 : 6 + Math.round(r(5.3) * 8), x0: r(12.9) * cols, y0: r(7.7) * rows,
+        vx: (r(2.2) - .5) * 1.4, vy: (r(4.4) - .5) * .8, seed: i * 5, a: .1 + r(9.1) * .1 });
     }
-    if (mx >= 0) { const gr = octx.createRadialGradient(mx, my, 0, mx, my, 10);
-      gr.addColorStop(0, 'rgba(255,255,255,.9)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
-      octx.fillStyle = gr; octx.fillRect(0, 0, cols, rows); }
-    const d = octx.getImageData(0, 0, cols, rows).data;
-    for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) {
-      const i = (y * cols + x) * 4, v = (d[i] * .3 + d[i + 1] * .59 + d[i + 2] * .11) / 255;
-      if (v < .06) continue;
-      ctx.fillStyle = `rgba(125,255,178,${.25 + v * .75})`;
-      ctx.fillText(RAMP2[Math.min(RAMP2.length - 1, Math.floor(v * RAMP2.length))], x * CELL_W, y * CELL_H);
-    }
-  };
-
-  // hover water: 2D ripple height field disturbed by the cursor
-  let hA = null, hB = null;
-  addEventListener('pointermove', () => { if (mode === 'water' && hA && mx >= 0) {
-    const x = Math.floor(mx), y = Math.floor(my); if (x > 1 && y > 1 && x < cols - 2 && y < rows - 2) hA[y * cols + x] = 6; } });
-  addEventListener('pointerdown', e => { if (mode === 'water' && hA && !e.target.closest('main')) {
-    const x = Math.floor(e.clientX / CELL_W), y = Math.floor(e.clientY / CELL_H);
-    for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) { const xx = x + dx, yy = y + dy;
-      if (xx > 0 && yy > 0 && xx < cols - 1 && yy < rows - 1) hA[yy * cols + xx] = 14; } } });
-  R.water = () => {
-    if (!hA || hA.length !== cols * rows) { hA = new Float32Array(cols * rows); hB = new Float32Array(cols * rows); }
-    for (let y = 1; y < rows - 1; y++) for (let x = 1; x < cols - 1; x++) {
-      const i = y * cols + x;
-      hB[i] = ((hA[i - 1] + hA[i + 1] + hA[i - cols] + hA[i + cols]) / 2 - hB[i]) * .965;
-    }
-    [hA, hB] = [hB, hA];
-    for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) {
-      const h = hA[y * cols + x], v = Math.min(1, Math.abs(h) / 4); if (v < .05) continue;
-      ctx.fillStyle = h > 0 ? `rgba(234,255,242,${.2 + v * .8})` : `rgba(125,255,178,${.15 + v * .6})`;
-      ctx.fillText(h > 0 ? '~' : (v > .5 ? 'o' : '.'), x * CELL_W, y * CELL_H);
-    }
-  };
-
-  // image trail: fading ascii stamps following the cursor
-  const STAMPS = [[' /\\_/\\ ', '( o.o )', ' > ^ < '], ['  .-.  ', ' (o o) ', '  |=|  '], [' _____ ', '|     |', '|_____|'], ['  /|\\  ', ' / | \\ ', '  \\|/  ']];
-  const trail = []; let lastTx = -1, lastTy = -1;
-  addEventListener('pointermove', e => {
-    if (mode !== 'trail') return;
-    const x = e.clientX / CELL_W, y = e.clientY / CELL_H;
-    if (Math.hypot(x - lastTx, y - lastTy) < 3) return;
-    lastTx = x; lastTy = y; trail.push({ x, y, t: performance.now(), s: Math.floor(Math.random() * STAMPS.length) });
-    if (trail.length > 40) trail.shift();
-  });
-  R.trail = (t, now) => {
-    for (const p of trail) {
-      const age = (now - p.t) / 1400; if (age >= 1) continue;
-      const st = STAMPS[p.s], a = (1 - age) * .9, rise = age * 4;
-      ctx.fillStyle = `rgba(125,255,178,${a})`;
-      st.forEach((line, i) => ctx.fillText(line, (p.x - 3.5) * CELL_W, (p.y - 1.5 + i - rise) * CELL_H));
-    }
-    while (trail.length && now - trail[0].t > 1400) trail.shift();
-  };
-
-  // interactive box grid: cells glow and flip characters near the cursor
-  const GW = 6, GH = 3; let energy = null;
-  R.grid = () => {
-    const gc = Math.ceil(cols / GW), gr = Math.ceil(rows / GH);
-    if (!energy || energy.length !== gc * gr) energy = new Float32Array(gc * gr);
-    for (let j = 0; j < gr; j++) for (let i = 0; i < gc; i++) {
-      const k = j * gc + i, cx = i * GW + GW / 2, cy = j * GH + GH / 2;
-      if (mx >= 0) energy[k] = Math.max(energy[k], Math.max(0, 1 - Math.hypot((cx - mx) * .55, cy - my) / 8));
-      energy[k] *= .93;
-      const e = energy[k];
-      ctx.fillStyle = `rgba(125,255,178,${.15 + e * .85})`;
-      const x0 = i * GW * CELL_W, y0 = j * GH * CELL_H;
-      ctx.fillText('+' + (e > .35 ? '=====' : '-----'), x0, y0);
-      ctx.fillText(e > .2 ? '|' + RAMP2[Math.min(9, Math.floor(e * 10))].repeat(4) + ' ' : '|    ', x0, y0 + CELL_H);
-      ctx.fillText(e > .6 ? '|@#@# ' : '|    ', x0, y0 + 2 * CELL_H);
-    }
-  };
+  }
+  function drawCollage(t) {
+    if (pKey !== cols + 'x' + rows) buildPaper();
+    paper.forEach(p => {
+      const x = Math.round(((p.x0 + p.vx * t) % (cols + p.w) + cols + p.w) % (cols + p.w) - p.w), y = Math.round(((p.y0 + p.vy * t) % (rows + p.h) + rows + p.h) % (rows + p.h) - p.h);
+      if (p.word) {
+        ctx.fillStyle = 'rgba(11,13,12,.92)'; ctx.fillRect(x * CELL_W, y * CELL_H, p.w * CELL_W, 3 * CELL_H);
+        ctx.fillStyle = 'rgba(212,47,35,.6)';
+        ctx.fillText('.' + '-'.repeat(p.w - 2) + '.', x * CELL_W, y * CELL_H);
+        ctx.fillText('| ' + p.word + ' |', x * CELL_W, (y + 1) * CELL_H);
+        ctx.fillText("'" + '-'.repeat(p.w - 2) + "'", x * CELL_W, (y + 2) * CELL_H);
+        return;
+      }
+      for (let r = 0; r < p.h; r++) {
+        const jl = Math.round(Math.sin(r * 1.3 + p.seed) * 1.6), jr = Math.round(Math.sin(r * 1.1 + p.seed * 2) * 1.6), w = p.w + jr - jl;
+        if (y + r < 0 || y + r >= rows) continue;
+        ctx.fillStyle = 'rgba(11,13,12,.85)'; ctx.fillRect((x + jl) * CELL_W, (y + r) * CELL_H, w * CELL_W, CELL_H);
+        ctx.fillStyle = `rgba(170,190,230,${p.a})`;
+        for (let c = 0; c < w; c++) ctx.fillText(NEWS[(c + r * 7 + p.seed) % NEWS.length], (x + jl + c) * CELL_W, (y + r) * CELL_H);
+      }
+    });
+  }
+  window.setBgMode = m => { mode = m; if (m === 'garden') gStart = performance.now(); };
 
   function frame(now) {
     const t = reduce ? 0 : (now - t0) / 1000;
@@ -245,7 +609,9 @@
       }
     }
     const lo = mode === 'rain' ? 1 : 0;
-    if (R[mode]) R[mode](t, now);
+    if (mode === 'garden') drawGarden(t, now);
+    else if (mode === 'network') drawNetwork(t);
+    else if (mode === 'collage') drawCollage(t);
     else if (!lo) {
       for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) {
         const v = field(x, y, t); if (v < .04) continue;
@@ -257,24 +623,6 @@
   }
   requestAnimationFrame(frame);
 })();
-</script>
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-<script src="lib/container.js"></script>
-<script src="lib/button.js"></script>
-<script>
-  // Liquid Glass JS (MIT, dashersw): a glass button floating over the ASCII canvas; click to cycle effects.
-  addEventListener('load', () => {
-    try {
-      const order = ['waves', 'pixels', 'water', 'trail', 'grid'];
-      const btn = new Button({ text: 'next effect', size: 22, type: 'pill', tintOpacity: 0.15, onClick: () => {
-        const cur = document.querySelector('#fx button[aria-pressed="true"]');
-        const i = cur ? order.indexOf(cur.dataset.mode) : -1;
-        document.querySelector('#fx button[data-mode="' + order[(i + 1) % order.length] + '"]').click();
-      } });
-      btn.element.style.cssText += ';position:fixed;right:24px;bottom:24px;z-index:5';
-      document.body.appendChild(btn.element);
-    } catch (e) { console.warn('glass button unavailable', e); }
-  });
 </script>
 </body>
 </html>
